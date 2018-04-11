@@ -1,4 +1,5 @@
 defmodule Hello.ReleaseTasks do
+
   @start_apps [
     :crypto,
     :ssl,
@@ -6,12 +7,26 @@ defmodule Hello.ReleaseTasks do
     :ecto
   ]
 
-  def myapp, do: Application.get_application(__MODULE__)
+  def myapp, do: :hello
 
   def repos, do: Application.get_env(myapp(), :ecto_repos, [])
 
   def seed do
+    # Run migrations
+    migrate()
+
+    # Run seed script
+    Enum.each(repos(), &run_seeds_for/1)
+
+    # Signal shutdown
+    IO.puts "Success!"
+    :init.stop()
+  end
+
+  defp prepare do
     me = myapp()
+
+    IO.puts "Migration directory: #{migrations_path(Hello.Repo)}"
 
     IO.puts "Loading #{me}.."
     # Load the code for myapp, but don't start it
@@ -24,19 +39,12 @@ defmodule Hello.ReleaseTasks do
     # Start the Repo(s) for myapp
     IO.puts "Starting repos.."
     Enum.each(repos(), &(&1.start_link(pool_size: 1)))
-
-    # Run migrations
-    migrate()
-
-    # Run seed script
-    Enum.each(repos(), &run_seeds_for/1)
-
-    # Signal shutdown
-    IO.puts "Success!"
-    :init.stop()
   end
 
-  def migrate, do: Enum.each(repos(), &run_migrations_for/1)
+  def migrate do
+    prepare()
+    Enum.each(repos(), &run_migrations_for/1)
+  end
 
   def priv_dir(app), do: "#{:code.priv_dir(app)}"
 
