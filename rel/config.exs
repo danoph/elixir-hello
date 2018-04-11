@@ -52,6 +52,6 @@ release :hello do
   set commands: [
     "migrate": "rel/commands/migrate.sh"
   ]
-  set pre_start_hook: "bin/migrate"
+  set pre_start_hook: "rel/commands/migrate.sh"
 end
 
