@@ -31,7 +31,15 @@ function renderOnlineUsers(presences) {
 
   Presence.list(presences, (id, {metas: [first, ...rest]}) => {
     let count = rest.length + 1
-    response += `<li>${id} (count: ${count})</li>`
+    let name;
+
+    if (id !== "undefined") {
+      name = id;
+    } else {
+      name = 'Anonymous';
+    }
+
+    response += `<li>${name} (${count})</li>`
   })
 
   document.querySelector("#users-list").innerHTML = response
