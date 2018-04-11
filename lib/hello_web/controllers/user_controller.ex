@@ -6,7 +6,7 @@ defmodule HelloWeb.UserController do
 
   def index(conn, _params) do
     users = Users.list_users()
-    render(conn, "index.html", users: users)
+    render(conn, "index." <> get_format(conn), users: users)
   end
 
   def new(conn, _params) do

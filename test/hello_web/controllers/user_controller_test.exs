@@ -17,6 +17,27 @@ defmodule HelloWeb.UserControllerTest do
       conn = get conn, user_path(conn, :index)
       assert html_response(conn, 200) =~ "Listing Users"
     end
+
+    test "responds with json", %{conn: conn} do
+      users = [%{name: "John", email: "john@example.com", bio: "john bio", number_of_pets: 123},
+               %{name: "Jane", email: "jane@example.com", bio: "jane bio", number_of_pets: 541}]
+
+      [{:ok, user1},{:ok, user2}] = Enum.map(users, &Users.create_user(&1))
+
+      response =
+        conn
+        |> get("/api/users")
+        |> json_response(200)
+
+      expected = %{
+        "data" => [
+          %{ "name" => user1.name, "email" => user1.email, "bio" => user1.bio, "number_of_pets" => user1.number_of_pets },
+          %{ "name" => user2.name, "email" => user2.email, "bio" => user2.bio, "number_of_pets" => user2.number_of_pets }
+        ]
+      }
+
+      assert response == expected
+    end
   end
 
   describe "new user" do

@@ -24,7 +24,9 @@ defmodule HelloWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", HelloWeb do
-  #   pipe_through :api
-  # end
+   scope "/api", HelloWeb do
+     pipe_through :api
+
+     resources "/users", UserController, only: [:index]
+   end
 end
