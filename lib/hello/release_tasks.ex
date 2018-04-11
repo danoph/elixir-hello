@@ -26,8 +26,6 @@ defmodule Hello.ReleaseTasks do
   defp prepare do
     me = myapp()
 
-    IO.puts "Migration directory: #{migrations_path(Hello.Repo)}"
-
     IO.puts "Loading #{me}.."
     # Load the code for myapp, but don't start it
     :ok = Application.load(me)
