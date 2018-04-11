@@ -42,7 +42,7 @@ defmodule HelloWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  #intercept ["user_joined"]
+  intercept ["user_joined"]
 
   def handle_out("user_joined", msg, socket) do
     #if Accounts.ignoring_user?(socket.assigns[:user], msg.user_id) do
