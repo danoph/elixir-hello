@@ -18,15 +18,15 @@ service:
 ingress:
   enabled: true
   annotations:
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+     kubernetes.io/ingress.class: nginx
+     kubernetes.io/tls-acme: "true"
   path: /
-  hosts:
-    - elixir.kops.sprouti.com
+  #hosts:
+    #- elixir.k8s.sketchdev.io
   tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+    - secretName: elixir-hello-tls
+      hosts:
+        - elixir.k8s.sketchdev.io
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

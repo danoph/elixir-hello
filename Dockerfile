@@ -1,26 +1,19 @@
-FROM elixir:alpine
-ARG APP_NAME=hello
-ARG PHOENIX_SUBDIR=.
-ENV MIX_ENV=prod REPLACE_OS_VARS=true TERM=xterm
-WORKDIR /opt/app
-RUN apk update \
-    && apk --no-cache --update add nodejs nodejs-npm \
-    && mix local.rebar --force \
-    && mix local.hex --force
-COPY . .
-RUN mix do deps.get, deps.compile, compile
-RUN cd ${PHOENIX_SUBDIR}/assets \
-    && npm install \
-    && ./node_modules/brunch/bin/brunch build -p \
-    && cd .. \
-    && mix phx.digest
-RUN mix release --env=prod --verbose \
-    && mv _build/prod/rel/${APP_NAME} /opt/release \
-    && mv /opt/release/bin/${APP_NAME} /opt/release/bin/start_server
-FROM alpine:latest
-RUN apk update && apk --no-cache --update add bash openssl-dev
-ENV PORT=8080 MIX_ENV=prod REPLACE_OS_VARS=true
-WORKDIR /opt/app
-EXPOSE ${PORT}
-COPY --from=0 /opt/release .
-CMD ["/opt/app/bin/start_server", "foreground"]
+FROM elixir:1.6.4
+
+RUN mix local.hex --force \
+ && mix archive.install --force  https://github.com/phoenixframework/archives/raw/master/phx_new-1.3.0.ez \
+ && apt-get update \
+ && curl -sL https://deb.nodesource.com/setup_6.x | bash \
+ && apt-get install -y apt-utils \
+ && apt-get install -y nodejs \
+ && apt-get install -y build-essential \
+ && apt-get install -y inotify-tools \
+ && mix local.rebar --force
+
+ENV APP_HOME /app
+RUN mkdir -p $APP_HOME
+WORKDIR $APP_HOME
+
+EXPOSE 4000
+
+CMD ["mix", "phx.server"]

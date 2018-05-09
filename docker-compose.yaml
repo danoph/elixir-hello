@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
   db: &DB
     image: postgres:9.4.5
@@ -11,15 +11,29 @@ services:
     volumes:
        - pgdata:/var/lib/postgresql/data
 
-  prod:
+  #prod:
+    #build: .
+    #ports:
+      #- 8080:8080
+    #environment: &ENV
+      #DATABASE_URL: ecto://user:password@db/hello_prod
+    #depends_on:
+      #- "db"
+    #links:
+      #- db:db
+
+  dev:
     build: .
     ports:
-      - 8080:8080
+      - 4000:4000
+    volumes:
+      - .:/app
     environment: &ENV
-      DATABASE_URL: ecto://user:password@db/hello_prod
+      DATABASE_URL: ecto://user:password@db/hello_dev
     depends_on:
       - "db"
     links:
       - db:db
+
 volumes:
   pgdata:
