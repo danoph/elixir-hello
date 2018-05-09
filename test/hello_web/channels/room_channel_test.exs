@@ -5,12 +5,20 @@ defmodule HelloWeb.RoomChannelTest do
 
   alias Hello.Meetings
   alias Hello.Meetings.Meeting
+  alias Hello.Users
 
   @create_attrs %{description: "some description", name: "some name", shortcode: "some shortcode", status: "some status"}
 
   def fixture(:meeting) do
     {:ok, meeting} = Meetings.create_meeting(@create_attrs)
     meeting
+  end
+
+  @user_create_attrs %{email: "some email", first_name: "some first_name", last_name: "some last_name", linked_in_profile_id: "some linked_in_profile_id", oauth_linked_in_token: "some oauth_linked_in_token", password_hash: "some password_hash", password_reset_at: ~N[2010-04-17 14:00:00.000000], password_reset_hash: "some password_reset_hash", system_role: "some system_role"}
+
+  def fixture(:user) do
+    {:ok, user} = Users.create_user(@user_create_attrs)
+    user
   end
 
   setup do
@@ -24,6 +32,20 @@ defmodule HelloWeb.RoomChannelTest do
   test "ping replies with status ok", %{socket: socket} do
     ref = push socket, "ping", %{"hello" => "there"}
     assert_reply ref, :ok, %{"hello" => "there"}
+  end
+
+  describe "authenticate" do
+    setup [:create_user]
+
+    test "api.authenticate", %{socket: socket} do
+      ref = push socket, "api.authenticate", %{"hello" => "there"}
+      assert_reply ref, :ok, %{"hello" => "there"}
+    end
+
+    defp create_user(_) do
+      user = fixture(:user)
+      {:ok, user: user}
+    end
   end
 
   test "status replies with status up and server timestamp", %{socket: socket} do
@@ -51,38 +73,38 @@ defmodule HelloWeb.RoomChannelTest do
     setup [:create_meeting]
 
     #test "gets meetings", %{socket: socket, meeting: meeting} do
-      #ref = push socket, "api.meetings.get"
+    #ref = push socket, "api.meetings.get"
 
-      #expected_meetings = [
-        #%{
-          #"id" => meeting.id,
-          #"name" => meeting.name,
-          #"description" => meeting.description,
-          #"status" => meeting.status,
-          #"shortcode": meeting.shortcode,
-        #}
-      #]
+    #expected_meetings = [
+    #%{
+    #"id" => meeting.id,
+    #"name" => meeting.name,
+    #"description" => meeting.description,
+    #"status" => meeting.status,
+    #"shortcode": meeting.shortcode,
+    #}
+    #]
 
-      #assert_reply ref, :ok, %{ "data": [] }
+    #assert_reply ref, :ok, %{ "data": [] }
     #end
 
     #test "gets meetings", %{socket: socket, meeting: meeting} do
     test "gets meetings", %{socket: socket, meeting: %Meeting{id: id, name: name, description: description, status: status, shortcode: shortcode } = meeting} do
-    #test "gets meetings", %{socket: socket, meeting: %Meeting{id: id } = meeting} do
+      #test "gets meetings", %{socket: socket, meeting: %Meeting{id: id } = meeting} do
       ref = push socket, "api.meetings.get"
 
       #assert Meetings.get_meeting!(meeting.id) == meeting
 
       #expected_reply = %{
-        #data: [
-          #%{
-            ##"description" => meeting.description,
-            #"id" => id,
-            ##"name" => meeting.name,
-            ##"status" => meeting.status,
-            ##"shortcode": meeting.shortcode,
-          #}
-        #]
+      #data: [
+      #%{
+      ##"description" => meeting.description,
+      #"id" => id,
+      ##"name" => meeting.name,
+      ##"status" => meeting.status,
+      ##"shortcode": meeting.shortcode,
+      #}
+      #]
       #}
 
       #assert_reply ref, :ok, ^expected_reply

@@ -25,5 +25,6 @@ defmodule HelloWeb.Router do
 
      resources "/users", UserController, except: [:new, :edit]
      resources "/meetings", MeetingController, except: [:new, :edit]
+     resources "/tokens", TokenController, except: [:new, :edit]
    end
 end

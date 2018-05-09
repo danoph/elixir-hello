@@ -6,6 +6,9 @@ defmodule HelloWeb.RoomChannel do
   alias HelloWeb.MeetingView
   #alias Hello.Meetings.Meeting
 
+  alias Hello.Users
+  alias HelloWeb.TokenView
+
   def join("room:lobby", _params, socket) do
     send(self(), :after_join)
     {:ok, socket}
@@ -38,6 +41,16 @@ defmodule HelloWeb.RoomChannel do
     meetings = Meetings.list_meetings()
     #{:reply, {:ok, %{data: [ %{ name: 'somasdasdf' } ] } }, socket}
     {:reply, {:ok, MeetingView.render("index.json", %{meetings: meetings}) }, socket}
+  end
+
+  def handle_in("api.authenticate", _, socket) do
+    user = List.first(Users.list_users)
+    IO.puts "users: #{user.id}"
+    token = Phoenix.Token.sign(socket, "user salt", user.id)
+
+    token_obj = %{ token: token, user: user }
+    {:reply, {:ok, TokenView.render("show.json", %{token: token_obj}) }, socket}
+    #{:reply, {:ok, %{ status: "up" } }, socket}
   end
 
   def handle_in("api.status", _, socket) do
