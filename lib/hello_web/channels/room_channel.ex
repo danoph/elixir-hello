@@ -2,6 +2,10 @@ defmodule HelloWeb.RoomChannel do
   use HelloWeb, :channel
   alias HelloWeb.Presence
 
+  alias Hello.Meetings
+  alias HelloWeb.MeetingView
+  #alias Hello.Meetings.Meeting
+
   def join("room:lobby", _params, socket) do
     send(self(), :after_join)
     {:ok, socket}
@@ -31,22 +35,10 @@ defmodule HelloWeb.RoomChannel do
   end
 
   def handle_in("api.meetings.get", _, socket) do
-    meeting1 = %{ name: "some meeting" }
-    {:reply, {:ok, %{ data: [ meeting1 ] } }, socket}
+    meetings = Meetings.list_meetings()
+    #{:reply, {:ok, %{data: [ %{ name: 'somasdasdf' } ] } }, socket}
+    {:reply, {:ok, MeetingView.render("index.json", %{meetings: meetings}) }, socket}
   end
-
-  #create_table "meetings", force: :cascade do |t|
-    #t.string   "name",               null: false
-    #t.text     "description",        null: false
-    #t.integer  "created_by_user_id", null: false
-    #t.string   "status",             null: false
-    #t.datetime "created_at",         null: false
-    #t.datetime "updated_at",         null: false
-    #t.integer  "current_topic_id"
-    #t.citext   "shortcode",          null: false
-    #t.index ["created_by_user_id"], name: "index_meetings_on_created_by_user_id", using: :btree
-    #t.index ["current_topic_id"], name: "index_meetings_on_current_topic_id", using: :btree
-  #end
 
   def handle_in("api.status", _, socket) do
     datetime = Ecto.DateTime.utc(:usec)
