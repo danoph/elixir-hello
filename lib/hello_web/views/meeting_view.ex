@@ -15,6 +15,9 @@ defmodule HelloWeb.MeetingView do
       name: meeting.name,
       description: meeting.description,
       status: meeting.status,
-      shortcode: meeting.shortcode}
+      shortcode: meeting.shortcode,
+      created_at: meeting.inserted_at,
+      updated_at: meeting.updated_at,
+    }
   end
 end

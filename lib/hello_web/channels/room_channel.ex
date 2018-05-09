@@ -41,6 +41,14 @@ defmodule HelloWeb.RoomChannel do
   end
 
   def handle_in("api.status", _, socket) do
+    user_id = 1
+    token = Phoenix.Token.sign(socket, "user salt", user_id)
+    IO.puts "token: #{token}"
+    {:ok, user_id} = Phoenix.Token.verify(socket, "user salt", token, max_age: 86400)
+    IO.puts "user_id: #{user_id}"
+    #{:error, :invalid} = Phoenix.Token.verify(socket, "user salt", token, max_age: 86400)
+    {:error, :invalid} = Phoenix.Token.verify(socket, "user salt2", token, max_age: 86400)
+
     datetime = Ecto.DateTime.utc(:usec)
     server_ts = datetime
                |> Ecto.DateTime.to_erl

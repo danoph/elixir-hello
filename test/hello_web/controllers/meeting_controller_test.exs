@@ -35,7 +35,10 @@ defmodule HelloWeb.MeetingControllerTest do
         "description" => "some description",
         "name" => "some name",
         "shortcode" => "some shortcode",
-        "status" => "some status"}
+        "status" => "some status",
+        #"created_at": inserted_at,
+        #"updated_at": updated_at
+      }
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -47,7 +50,7 @@ defmodule HelloWeb.MeetingControllerTest do
   describe "update meeting" do
     setup [:create_meeting]
 
-    test "renders meeting when data is valid", %{conn: conn, meeting: %Meeting{id: id} = meeting} do
+    test "renders meeting when data is valid", %{conn: conn, meeting: %Meeting{id: id, inserted_at: inserted_at, updated_at: updated_at } = meeting} do
       conn = put conn, meeting_path(conn, :update, meeting), meeting: @update_attrs
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
@@ -57,7 +60,10 @@ defmodule HelloWeb.MeetingControllerTest do
         "description" => "some updated description",
         "name" => "some updated name",
         "shortcode" => "some updated shortcode",
-        "status" => "some status"}
+        "status" => "some status",
+        "created_at": inserted_at,
+        "updated_at": updated_at
+      }
     end
 
     test "renders errors when data is invalid", %{conn: conn, meeting: meeting} do
