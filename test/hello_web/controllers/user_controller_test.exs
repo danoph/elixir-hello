@@ -2,91 +2,79 @@ defmodule HelloWeb.UserControllerTest do
   use HelloWeb.ConnCase
 
   alias Hello.Users
+  alias Hello.Users.User
 
-  @create_attrs %{bio: "some bio", email: "some email", name: "some name", number_of_pets: 42}
-  @update_attrs %{bio: "some updated bio", email: "some updated email", name: "some updated name", number_of_pets: 43}
-  @invalid_attrs %{bio: nil, email: nil, name: nil, number_of_pets: nil}
+  @create_attrs %{email: "some email", first_name: "some first_name", last_name: "some last_name", linked_in_profile_id: "some linked_in_profile_id", oauth_linked_in_token: "some oauth_linked_in_token", password_hash: "some password_hash", password_reset_at: ~N[2010-04-17 14:00:00.000000], password_reset_hash: "some password_reset_hash", system_role: "some system_role"}
+  @update_attrs %{email: "some updated email", first_name: "some updated first_name", last_name: "some updated last_name", linked_in_profile_id: "some updated linked_in_profile_id", oauth_linked_in_token: "some updated oauth_linked_in_token", password_hash: "some updated password_hash", password_reset_at: ~N[2011-05-18 15:01:01.000000], password_reset_hash: "some updated password_reset_hash", system_role: "some updated system_role"}
+  @invalid_attrs %{email: nil, first_name: nil, last_name: nil, linked_in_profile_id: nil, oauth_linked_in_token: nil, password_hash: nil, password_reset_at: nil, password_reset_hash: nil, system_role: nil}
 
   def fixture(:user) do
     {:ok, user} = Users.create_user(@create_attrs)
     user
   end
 
+  setup %{conn: conn} do
+    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+  end
+
   describe "index" do
     test "lists all users", %{conn: conn} do
       conn = get conn, user_path(conn, :index)
-      assert html_response(conn, 200) =~ "Listing Users"
-    end
-
-    test "responds with json", %{conn: conn} do
-      users = [%{name: "John", email: "john@example.com", bio: "john bio", number_of_pets: 123},
-               %{name: "Jane", email: "jane@example.com", bio: "jane bio", number_of_pets: 541}]
-
-      [{:ok, user1},{:ok, user2}] = Enum.map(users, &Users.create_user(&1))
-
-      response =
-        conn
-        |> get("/api/users")
-        |> json_response(200)
-
-      expected = %{
-        "data" => [
-          %{ "name" => user1.name, "email" => user1.email, "bio" => user1.bio, "number_of_pets" => user1.number_of_pets },
-          %{ "name" => user2.name, "email" => user2.email, "bio" => user2.bio, "number_of_pets" => user2.number_of_pets }
-        ]
-      }
-
-      assert response == expected
-    end
-  end
-
-  describe "new user" do
-    test "renders form", %{conn: conn} do
-      conn = get conn, user_path(conn, :new)
-      assert html_response(conn, 200) =~ "New User"
+      assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create user" do
-    test "redirects to show when data is valid", %{conn: conn} do
+    test "renders user when data is valid", %{conn: conn} do
       conn = post conn, user_path(conn, :create), user: @create_attrs
-
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == user_path(conn, :show, id)
+      assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get conn, user_path(conn, :show, id)
-      assert html_response(conn, 200) =~ "Show User"
+      assert json_response(conn, 200)["data"] == %{
+        "id" => id,
+        "email" => "some email",
+        "first_name" => "some first_name",
+        "last_name" => "some last_name",
+        "linked_in_profile_id" => "some linked_in_profile_id",
+        "oauth_linked_in_token" => "some oauth_linked_in_token",
+        "password_hash" => "some password_hash",
+        #"password_reset_at" => ~N[2010-04-17 14:00:00.000000],
+        "password_reset_at" => "2010-04-17T14:00:00.000000",
+        "password_reset_hash" => "some password_reset_hash",
+        "system_role" => "some system_role"}
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post conn, user_path(conn, :create), user: @invalid_attrs
-      assert html_response(conn, 200) =~ "New User"
-    end
-  end
-
-  describe "edit user" do
-    setup [:create_user]
-
-    test "renders form for editing chosen user", %{conn: conn, user: user} do
-      conn = get conn, user_path(conn, :edit, user)
-      assert html_response(conn, 200) =~ "Edit User"
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "update user" do
     setup [:create_user]
 
-    test "redirects when data is valid", %{conn: conn, user: user} do
+    test "renders user when data is valid", %{conn: conn, user: %User{id: id} = user} do
       conn = put conn, user_path(conn, :update, user), user: @update_attrs
-      assert redirected_to(conn) == user_path(conn, :show, user)
+      assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
-      conn = get conn, user_path(conn, :show, user)
-      assert html_response(conn, 200) =~ "some updated bio"
+      conn = get conn, user_path(conn, :show, id)
+      assert json_response(conn, 200)["data"] == %{
+        "id" => id,
+        "email" => "some updated email",
+        "first_name" => "some updated first_name",
+        "last_name" => "some updated last_name",
+        "linked_in_profile_id" => "some updated linked_in_profile_id",
+        "oauth_linked_in_token" => "some updated oauth_linked_in_token",
+        "password_hash" => "some updated password_hash",
+        #"password_reset_at" => ~N[2011-05-18 15:01:01.000000],
+        "password_reset_at" => "2011-05-18T15:01:01.000000",
+        "password_reset_hash" => "some updated password_reset_hash",
+        "system_role" => "some updated system_role"}
     end
 
     test "renders errors when data is invalid", %{conn: conn, user: user} do
       conn = put conn, user_path(conn, :update, user), user: @invalid_attrs
-      assert html_response(conn, 200) =~ "Edit User"
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
@@ -95,7 +83,7 @@ defmodule HelloWeb.UserControllerTest do
 
     test "deletes chosen user", %{conn: conn, user: user} do
       conn = delete conn, user_path(conn, :delete, user)
-      assert redirected_to(conn) == user_path(conn, :index)
+      assert response(conn, 204)
       assert_error_sent 404, fn ->
         get conn, user_path(conn, :show, user)
       end

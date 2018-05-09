@@ -6,9 +6,9 @@ defmodule Hello.UsersTest do
   describe "users" do
     alias Hello.Users.User
 
-    @valid_attrs %{bio: "some bio", email: "some email", name: "some name", number_of_pets: 42}
-    @update_attrs %{bio: "some updated bio", email: "some updated email", name: "some updated name", number_of_pets: 43}
-    @invalid_attrs %{bio: nil, email: nil, name: nil, number_of_pets: nil}
+    @valid_attrs %{email: "some email", first_name: "some first_name", last_name: "some last_name", linked_in_profile_id: "some linked_in_profile_id", oauth_linked_in_token: "some oauth_linked_in_token", password_hash: "some password_hash", password_reset_at: ~N[2010-04-17 14:00:00.000000], password_reset_hash: "some password_reset_hash", system_role: "some system_role"}
+    @update_attrs %{email: "some updated email", first_name: "some updated first_name", last_name: "some updated last_name", linked_in_profile_id: "some updated linked_in_profile_id", oauth_linked_in_token: "some updated oauth_linked_in_token", password_hash: "some updated password_hash", password_reset_at: ~N[2011-05-18 15:01:01.000000], password_reset_hash: "some updated password_reset_hash", system_role: "some updated system_role"}
+    @invalid_attrs %{email: nil, first_name: nil, last_name: nil, linked_in_profile_id: nil, oauth_linked_in_token: nil, password_hash: nil, password_reset_at: nil, password_reset_hash: nil, system_role: nil}
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
@@ -23,18 +23,22 @@ defmodule Hello.UsersTest do
       user = user_fixture()
       assert Users.list_users() == [user]
     end
-
-    test "get_user!/1 returns the user with given id" do
+test "get_user!/1 returns the user with given id" do
       user = user_fixture()
       assert Users.get_user!(user.id) == user
     end
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Users.create_user(@valid_attrs)
-      assert user.bio == "some bio"
       assert user.email == "some email"
-      assert user.name == "some name"
-      assert user.number_of_pets == 42
+      assert user.first_name == "some first_name"
+      assert user.last_name == "some last_name"
+      assert user.linked_in_profile_id == "some linked_in_profile_id"
+      assert user.oauth_linked_in_token == "some oauth_linked_in_token"
+      assert user.password_hash == "some password_hash"
+      assert user.password_reset_at == ~N[2010-04-17 14:00:00.000000]
+      assert user.password_reset_hash == "some password_reset_hash"
+      assert user.system_role == "some system_role"
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -45,10 +49,15 @@ defmodule Hello.UsersTest do
       user = user_fixture()
       assert {:ok, user} = Users.update_user(user, @update_attrs)
       assert %User{} = user
-      assert user.bio == "some updated bio"
       assert user.email == "some updated email"
-      assert user.name == "some updated name"
-      assert user.number_of_pets == 43
+      assert user.first_name == "some updated first_name"
+      assert user.last_name == "some updated last_name"
+      assert user.linked_in_profile_id == "some updated linked_in_profile_id"
+      assert user.oauth_linked_in_token == "some updated oauth_linked_in_token"
+      assert user.password_hash == "some updated password_hash"
+      assert user.password_reset_at == ~N[2011-05-18 15:01:01.000000]
+      assert user.password_reset_hash == "some updated password_reset_hash"
+      assert user.system_role == "some updated system_role"
     end
 
     test "update_user/2 with invalid data returns error changeset" do

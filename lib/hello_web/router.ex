@@ -17,13 +17,12 @@ defmodule HelloWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    resources "/users", UserController
   end
 
   # Other scopes may use custom stacks.
    scope "/api", HelloWeb do
      pipe_through :api
 
-     resources "/users", UserController, only: [:index]
+     resources "/users", UserController
    end
 end

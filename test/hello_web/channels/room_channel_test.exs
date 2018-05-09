@@ -5,7 +5,6 @@ defmodule HelloWeb.RoomChannelTest do
 
   setup do
     {:ok, _, socket} =
-      #socket("user_id", %{some: :assign})
       socket("user_id", %{user_id: :assign})
       |> subscribe_and_join(RoomChannel, "room:lobby")
 
@@ -40,12 +39,7 @@ defmodule HelloWeb.RoomChannelTest do
 
   test "gets meetings", %{socket: socket} do
     ref = push socket, "api.meetings.get"
-    assert_reply ref, :ok, %{ "data": [ %{ name: 'some meeting' } ] }
-  end
-
-  test "gets meetings/3", %{socket: socket} do
-    ref = push socket, "api.meetings.get", %{ data: %{} }
-    assert_reply ref, :ok, %{ "data": [ %{ name: 'some meeting' } ] }
+    assert_reply ref, :ok, %{ "data": [ %{ name: "some meeting" } ] }
   end
 
   test "broadcasts are pushed to the client", %{socket: socket} do
