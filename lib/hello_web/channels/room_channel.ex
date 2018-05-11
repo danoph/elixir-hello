@@ -43,24 +43,21 @@ defmodule HelloWeb.RoomChannel do
     {:reply, {:ok, MeetingView.render("index.json", %{meetings: meetings}) }, socket}
   end
 
-  def handle_in("api.authenticate", _, socket) do
-    user = List.first(Users.list_users)
-    IO.puts "users: #{user.id}"
+  def handle_in("api.authenticate", %{ "email" => email, "password" => password }, socket) do
+    user = Users.get_by(%{ email: email, password: password })
     token = Phoenix.Token.sign(socket, "user salt", user.id)
 
     token_obj = %{ token: token, user: user }
-    {:reply, {:ok, TokenView.render("show.json", %{token: token_obj}) }, socket}
-    #{:reply, {:ok, %{ status: "up" } }, socket}
+    #{:reply, {:ok, TokenView.render("show.json", %{token: token_obj}) }, socket}
+    {:reply, {:ok, TokenView.render("show.json", %{token: token}) }, socket}
   end
 
   def handle_in("api.status", _, socket) do
     user_id = 1
     token = Phoenix.Token.sign(socket, "user salt", user_id)
-    IO.puts "token: #{token}"
-    {:ok, user_id} = Phoenix.Token.verify(socket, "user salt", token, max_age: 86400)
-    IO.puts "user_id: #{user_id}"
+    #{:ok, user_id} = Phoenix.Token.verify(socket, "user salt", token, max_age: 86400)
     #{:error, :invalid} = Phoenix.Token.verify(socket, "user salt", token, max_age: 86400)
-    {:error, :invalid} = Phoenix.Token.verify(socket, "user salt2", token, max_age: 86400)
+    #{:error, :invalid} = Phoenix.Token.verify(socket, "user salt2", token, max_age: 86400)
 
     datetime = Ecto.DateTime.utc(:usec)
     server_ts = datetime

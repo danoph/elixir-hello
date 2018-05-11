@@ -14,7 +14,7 @@ defmodule HelloWeb.RoomChannelTest do
     meeting
   end
 
-  @user_create_attrs %{email: "some email", first_name: "some first_name", last_name: "some last_name", linked_in_profile_id: "some linked_in_profile_id", oauth_linked_in_token: "some oauth_linked_in_token", password_hash: "some password_hash", password_reset_at: ~N[2010-04-17 14:00:00.000000], password_reset_hash: "some password_reset_hash", system_role: "some system_role"}
+  @user_create_attrs %{email: "email@example.com", first_name: "some first_name", last_name: "some last_name", linked_in_profile_id: "some linked_in_profile_id", oauth_linked_in_token: "some oauth_linked_in_token", password_hash: "pass", password_reset_at: ~N[2010-04-17 14:00:00.000000], password_reset_hash: "some password_reset_hash", system_role: "some system_role"}
 
   def fixture(:user) do
     {:ok, user} = Users.create_user(@user_create_attrs)
@@ -38,8 +38,32 @@ defmodule HelloWeb.RoomChannelTest do
     setup [:create_user]
 
     test "api.authenticate", %{socket: socket} do
-      ref = push socket, "api.authenticate", %{"hello" => "there"}
-      assert_reply ref, :ok, %{"hello" => "there"}
+      ref = push socket, "api.authenticate", %{"email": "email@example.com", "password": "pass"}
+
+      #user_email_hash = :crypto.hash(:md5, "email@example.com")
+                        #|> Base.encode16
+                        #|> String.downcase
+
+      assert_reply ref, :ok, %{
+        data: %{
+          token: "hello"
+        }
+        #"data" => %{
+          #"token" => "hello",
+        #}
+      }
+
+      #assert_reply ref, :ok, %{
+        #"data" => %{
+          #"token" => "something",
+          #"user" => %{
+            #"id": 12,
+            #"first_name": "some first name",
+            #"last_name": "some last name",
+            #"avatar_url": "https://www.gravatar.com/avatar/something?default=identicon"
+          #}
+        #}
+      #}
     end
 
     defp create_user(_) do

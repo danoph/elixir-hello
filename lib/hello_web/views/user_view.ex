@@ -15,11 +15,7 @@ defmodule HelloWeb.UserView do
       first_name: user.first_name,
       last_name: user.last_name,
       full_name: "#{user.first_name} #{user.last_name}",
-      oauth_linked_in_token: user.oauth_linked_in_token,
-      linked_in_profile_id: user.linked_in_profile_id,
       system_role: user.system_role,
-      password_reset_hash: user.password_reset_hash,
-      password_reset_at: user.password_reset_at,
       avatar_url: avatar_url(user.email),
       created_at: user.inserted_at,
       updated_at: user.updated_at

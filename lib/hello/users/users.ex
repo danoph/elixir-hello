@@ -21,6 +21,14 @@ defmodule Hello.Users do
     Repo.all(User)
   end
 
+  def get_by(%{ email: email, password: password }) do
+    Repo.get_by!(User, email: email, password_hash: password)
+  end
+
+  def get_by(%{ email: email }) do
+    Repo.get_by(User, email: email)
+  end
+
   @doc """
   Gets a single user.
 

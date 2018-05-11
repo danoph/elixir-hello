@@ -11,11 +11,12 @@ defmodule HelloWeb.TokenView do
     %{data: render_one(token, TokenView, "token.json")}
   end
 
-  #def render("token.json", %{token: token}) do
-    #%{ token: token }
-  #end
-
   def render("token.json", %{token: token}) do
-    %{ token: token.token, user: UserView.render("user.json", %{ user: token.user }) }
+    %{ token: "hello" }
+    #%{ token: token }
   end
+
+  #def render("token.json", %{token: token}) do
+    #%{ token: token.token, user: UserView.render("user.json", %{ user: token.user }) }
+  #end
 end
