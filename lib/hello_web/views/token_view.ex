@@ -12,8 +12,7 @@ defmodule HelloWeb.TokenView do
   end
 
   def render("token.json", %{token: token}) do
-    %{ token: "hello" }
-    #%{ token: token }
+    %{ token: token }
   end
 
   #def render("token.json", %{token: token}) do

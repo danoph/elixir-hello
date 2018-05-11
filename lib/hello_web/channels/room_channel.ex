@@ -7,6 +7,9 @@ defmodule HelloWeb.RoomChannel do
   #alias Hello.Meetings.Meeting
 
   alias Hello.Users
+
+  alias Hello.Tokens
+  alias Hello.Tokens.Token
   alias HelloWeb.TokenView
 
   def join("room:lobby", _params, socket) do
@@ -45,20 +48,27 @@ defmodule HelloWeb.RoomChannel do
 
   def handle_in("api.authenticate", %{ "email" => email, "password" => password }, socket) do
     user = Users.get_by(%{ email: email, password: password })
-    token = Phoenix.Token.sign(socket, "user salt", user.id)
+    token_string = Phoenix.Token.sign(socket, "user salt", user.id)
 
-    token_obj = %{ token: token, user: user }
-    #{:reply, {:ok, TokenView.render("show.json", %{token: token_obj}) }, socket}
-    {:reply, {:ok, TokenView.render("show.json", %{token: token}) }, socket}
-  end
-
-  def handle_in("api.status", _, socket) do
-    user_id = 1
-    token = Phoenix.Token.sign(socket, "user salt", user_id)
     #{:ok, user_id} = Phoenix.Token.verify(socket, "user salt", token, max_age: 86400)
     #{:error, :invalid} = Phoenix.Token.verify(socket, "user salt", token, max_age: 86400)
     #{:error, :invalid} = Phoenix.Token.verify(socket, "user salt2", token, max_age: 86400)
 
+
+    with {:ok, %Token{} = token} <- Tokens.create_token(%{ token: token_string, user_id: user.id }) do
+      {:reply, {:ok, TokenView.render("show.json", %{token: token_string}) }, socket}
+      #conn
+      #|> put_status(:created)
+      #|> put_resp_header("location", token_path(conn, :show, token))
+      #|> render("show.json", token: token)
+    end
+
+    #token_obj = %{ token: token, user: user }
+    #{:reply, {:ok, TokenView.render("show.json", %{token: token_obj}) }, socket}
+    #{:reply, {:ok, TokenView.render("show.json", %{token: token_string}) }, socket}
+  end
+
+  def handle_in("api.status", _, socket) do
     datetime = Ecto.DateTime.utc(:usec)
     server_ts = datetime
                |> Ecto.DateTime.to_erl

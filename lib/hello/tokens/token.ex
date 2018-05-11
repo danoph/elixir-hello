@@ -5,7 +5,7 @@ defmodule Hello.Tokens.Token do
 
   schema "tokens" do
     field :token, :string
-    field :user_id, :id
+    belongs_to :user, Hello.Users.User
 
     timestamps()
   end
@@ -13,7 +13,7 @@ defmodule Hello.Tokens.Token do
   @doc false
   def changeset(token, attrs) do
     token
-    |> cast(attrs, [:token])
-    |> validate_required([:token])
+    |> cast(attrs, [:token, :user_id])
+    |> validate_required([:token, :user_id])
   end
 end

@@ -7,6 +7,8 @@ defmodule HelloWeb.RoomChannelTest do
   alias Hello.Meetings.Meeting
   alias Hello.Users
 
+  alias Hello.Tokens
+
   @create_attrs %{description: "some description", name: "some name", shortcode: "some shortcode", status: "some status"}
 
   def fixture(:meeting) do
@@ -40,18 +42,37 @@ defmodule HelloWeb.RoomChannelTest do
     test "api.authenticate", %{socket: socket} do
       ref = push socket, "api.authenticate", %{"email": "email@example.com", "password": "pass"}
 
+      #last_token = Tokens.last!
+      #last_token_string = last_token.token
+
       #user_email_hash = :crypto.hash(:md5, "email@example.com")
                         #|> Base.encode16
                         #|> String.downcase
+      #assert_reply ref, :ok
+      #last_token = Tokens.last!
+      #last_token_string = last_token.token
 
-      assert_reply ref, :ok, %{
-        data: %{
-          token: "hello"
-        }
-        #"data" => %{
-          #"token" => "hello",
-        #}
-      }
+      #test "handle RabbitMQ message", %{socket: _socket} do
+        #Phoenix.PubSub.subscribe MyApp.PubSub, "room:lobby"
+        #payload = %{foo: "bar"}
+        #RabbitMQ.trigger!(payload)
+        #assert_receive ^payload, 3_000
+      #end
+
+      #IO.puts "token: #{last_token_string}"
+
+      assert_reply ref, :ok, %{} = payload
+
+      last_token = Tokens.last!
+      last_token_string = last_token.token
+
+      assert payload.data.token === last_token_string
+      assert %{
+      } === payload.data.user
+      #IO.puts "token: #{last_token_string}"
+      #IO.puts "payload:"
+      #IO.inspect payload.data
+      #last_token = Tokens.last!
 
       #assert_reply ref, :ok, %{
         #"data" => %{

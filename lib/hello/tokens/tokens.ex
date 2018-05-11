@@ -101,4 +101,8 @@ defmodule Hello.Tokens do
   def change_token(%Token{} = token) do
     Token.changeset(token, %{})
   end
+
+  def last!() do
+    Repo.one!(from x in Token, order_by: [desc: x.id], limit: 1)
+  end
 end
